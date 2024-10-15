@@ -1,12 +1,23 @@
+import { TSignupUser } from "./api.types";
 import { supabase } from "./supabaseClient";
 
-export const getTest = async () => {
-	try {
-		console.log("before fetchig");
-		const data = await supabase.from("test").select();
-		console.log(data);
-		return data;
-	} catch (error) {
+export const singUpNewUser = async ({
+	email,
+	password,
+	username,
+}: TSignupUser) => {
+	const { data: signInData, error } = await supabase.auth.signUp({
+		email,
+		password,
+		options: {
+			data: {
+				username,
+			},
+		},
+	});
+	if (error) {
 		console.log(error);
+		throw new Error(error.message);
 	}
+	return signInData;
 };

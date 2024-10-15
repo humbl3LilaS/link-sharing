@@ -1,25 +1,27 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { SignupSchema, SingupSchemaType } from "../validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { cn } from "../util";
+import { singUpNewUser } from "../api/api";
 
 const SignupForm = () => {
 	const {
 		register,
 		handleSubmit,
 		formState: { errors, isSubmitting, isValid },
-		getValues,
-	} = useForm<SingupSchemaType>({ resolver: zodResolver(SignupSchema) });
+	} = useForm<SingupSchemaType>({
+		resolver: zodResolver(SignupSchema),
+		mode: "onTouched",
+	});
+
+	const navigate = useNavigate();
 
 	const [showPassword, setShowPassword] = useState({
 		password: false,
 		confirmPassword: false,
 	});
-
-	// const isPasswordValid =
-	// 	getValues("password") === getValues("confirmPassword");
 
 	const togglePasswordField = (payload: {
 		password?: boolean;
@@ -28,8 +30,16 @@ const SignupForm = () => {
 		setShowPassword((prev) => ({ ...prev, ...payload }));
 	};
 
-	const onSubmit: SubmitHandler<SingupSchemaType> = (value) => {
+	const onSubmit: SubmitHandler<SingupSchemaType> = async (value) => {
 		console.log(value);
+		const user = await singUpNewUser({
+			email: value.email,
+			password: value.password,
+			username: value.username,
+		});
+		console.log("user", user.session);
+		console.log("session", user.session);
+		navigate("/");
 	};
 
 	return (
@@ -39,24 +49,24 @@ const SignupForm = () => {
 			<div>
 				<label
 					htmlFor="username"
-					className="mb-1 block text-xs lg:text-lg lg:mb-4">
+					className="mb-1 block text-xs">
 					Username
 				</label>
-				<div className="py-3 px-4 flex items-center gap-x-3 border border-[#d9d9d9] rounded-lg focus-within:border-primary">
+				<div className="py-3 px-4 flex items-center gap-x-3 border relative border-[#d9d9d9] rounded-lg focus-within:border-primary">
 					<img
 						src="/assets/images/user.svg"
 						alt="username"
-						className="aspect-square w-4 md:w-8"
+						className="aspect-square w-4"
 					/>
 					<input
-						className="flex-1 focus:outline-none md:placeholder:text-lg lg:p-4"
+						className="flex-1 focus:outline-none "
 						placeholder="e.g SuperEdelweiss"
 						id="username"
 						type="text"
 						{...register("username")}
 					/>
 					{errors.username && (
-						<span className="absolute right-[15%] text-sm text-danger">
+						<span className="absolute right-[10%] text-sm text-danger md:right-[5%]">
 							{errors.username.message}
 						</span>
 					)}
@@ -66,24 +76,24 @@ const SignupForm = () => {
 			<div>
 				<label
 					htmlFor="email"
-					className="mb-1 block text-xs lg:text-lg lg:mb-4">
+					className="mb-1 block text-xs ">
 					Email address
 				</label>
-				<div className="py-3 px-4 flex items-center gap-x-3 border border-[#d9d9d9] rounded-lg focus-within:border-primary">
+				<div className="py-3 px-4 flex items-center gap-x-3 relative border border-[#d9d9d9] rounded-lg focus-within:border-primary">
 					<img
 						src="/assets/images/icon-email.svg"
 						alt="email"
-						className="aspect-square w-4 md:w-8"
+						className="aspect-square w-4 "
 					/>
 					<input
-						className="flex-1 focus:outline-none md:placeholder:text-lg lg:p-4"
+						className="flex-1 focus:outline-none "
 						placeholder="e.g alex@email.com"
 						id="email"
 						type="text"
 						{...register("email")}
 					/>
 					{errors.email && (
-						<span className="absolute right-[15%] text-sm text-danger">
+						<span className="absolute right-[10%] text-sm text-danger md:right-[5%]">
 							{errors.email.message}
 						</span>
 					)}
@@ -93,17 +103,17 @@ const SignupForm = () => {
 			<div>
 				<label
 					htmlFor="password"
-					className="mb-1 block text-xs lg:text-lg lg:mb-4">
+					className="mb-1 block text-xs ">
 					Password
 				</label>
 				<div className="py-3 px-4 flex items-center gap-x-3 border border-[#d9d9d9] rounded-lg focus-within:border-primary">
 					<img
 						src="/assets/images/icon-password.svg"
 						alt="password"
-						className="aspect-square w-4 md:w-8"
+						className="aspect-square w-4 "
 					/>
 					<input
-						className="flex-1 focus:outline-none md:placeholder:text-lg lg:p-4"
+						className="flex-1 focus:outline-none "
 						placeholder="e.g sup@asd2we3"
 						id="password"
 						type={showPassword.password ? "text" : "password"}
@@ -132,17 +142,17 @@ const SignupForm = () => {
 			<div>
 				<label
 					htmlFor="confirm-password"
-					className="mb-1 block text-xs lg:text-lg lg:mb-4">
+					className="mb-1 block text-xs ">
 					Confirm Password
 				</label>
 				<div className="py-3 px-4 flex items-center gap-x-3 border border-[#d9d9d9] rounded-lg focus-within:border-primary">
 					<img
 						src="/assets/images/icon-password.svg"
 						alt="confirm password"
-						className="aspect-square w-4 md:w-8"
+						className="aspect-square w-4 "
 					/>
 					<input
-						className="flex-1 focus:outline-none md:placeholder:text-lg lg:p-4"
+						className="flex-1 focus:outline-none "
 						placeholder="e.g sup@asd2we3"
 						id="confirm-password"
 						type={showPassword.confirmPassword ? "text" : "password"}
@@ -173,17 +183,15 @@ const SignupForm = () => {
 			</div>
 
 			<button
-				className="py-3 px-7 rounded-lg bg-primary font-semibold  text-white lg:text-lg lg:py-5
+				className="py-3 px-7 rounded-lg bg-primary font-semibold  text-white 
 					disabled:bg-tertiary active:bg-secondary"
 				disabled={isSubmitting || !isValid}>
 				{isSubmitting ? "Submiting" : "Create new account"}
 			</button>
 
 			<div>
-				<p className="text-[#737373] text-center lg:text-lg">
-					Already have an account
-				</p>
-				<p className="text-center lg:text-lg">
+				<p className="text-[#737373] text-center ">Already have an account</p>
+				<p className="text-center ">
 					<Link
 						to={"/auth/login"}
 						className="text-primary">
