@@ -1,10 +1,20 @@
-import { useTestQuery } from "./api/query";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+
+const routers = createBrowserRouter([
+	{ path: "/", element: <div>Home</div> },
+	{
+		path: "/auth",
+		children: [
+			{ path: "login", element: <Login /> },
+			{ path: "sign-up", element: <SignUp /> },
+		],
+	},
+]);
 
 function App() {
-	const { data } = useTestQuery();
-	console.log(data);
-
-	return <h1 className="text-3xl text-red-500">h1</h1>;
+	return <RouterProvider router={routers} />;
 }
 
 export default App;
