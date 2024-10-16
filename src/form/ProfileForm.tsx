@@ -4,9 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ProfileFormSchema } from "../validation/index";
 import { TUserData } from "../api/api.types";
 import { useEffect } from "react";
-import { supabase } from "../api/supabaseClient";
 import { useLogout } from "../api/mutation";
-import { logout } from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {

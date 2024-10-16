@@ -79,27 +79,44 @@ export const getAllLink = async (
 };
 
 export const updateLink = async (payload: LinkUpdateProps[]) => {
-	await payload.forEach(async (link) => {
-		if (link.isInsert) {
-			const { error } = await supabase.from("links").insert({
-				origin: link.data.origin,
-				link: link.data.link,
-				user_id: link.data.user_id,
-			});
-			if (error) {
-				throw new Error(error.message);
+	try {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const promises = payload.map(async (link: LinkUpdateProps) => {
+			if (link.isInsert) {
+				const { data, error } = await supabase
+					.from("links")
+					.insert({
+						origin: link.data.origin,
+						link: link.data.link,
+						user_id: link.data.user_id,
+					})
+					.select()
+					.single();
+				if (error) {
+					throw new Error(error.message);
+				}
+				console.log("inside update loop", data);
+				return data;
+			} else {
+				const { data, error } = await supabase
+					.from("links")
+					.update({ origin: link.data.origin, link: link.data.link })
+					.eq("id", link.data?.id)
+					.select()
+					.single();
+				if (error) {
+					throw new Error(error.message);
+				}
+
+				return data;
 			}
-		} else {
-			const { error } = await supabase
-				.from("links")
-				.update({ origin: link.data.origin, link: link.data.link })
-				.eq("user_id", link.data.user_id);
-			if (error) {
-				throw new Error(error.message);
-			}
-		}
-	});
-	return true;
+		});
+		const data = await Promise.all(promises);
+		return data;
+	} catch (error) {
+		console.log(error);
+		throw new Error("heelo");
+	}
 };
 
 export const deleteLink = async (id: number) => {

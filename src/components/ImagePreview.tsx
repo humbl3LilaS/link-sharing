@@ -5,6 +5,8 @@ import { cn } from "../util";
 const ImagePreview = () => {
 	const { data: user } = useUserQuery();
 	const { data: links } = useGetSavedLink(user?.id);
+	// console.log("links in image preview ", links);
+
 	const styledLinks = useGenerateLinkFormValue(links ?? []).map(
 		(item) => item.platform,
 	);

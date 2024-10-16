@@ -21,7 +21,6 @@ const LinksForm = ({ defaultValues }: LinkFormProps) => {
 	const { data: user } = useUserQuery();
 	const { mutateAsync: updateLink } = useUpdateLink();
 	const { mutateAsync: deleteLink } = useDeleteLink();
-	console.log(user?.id);
 
 	const { register, control, handleSubmit, reset } = useForm<LinkFormInput>({
 		defaultValues: {
@@ -42,7 +41,7 @@ const LinksForm = ({ defaultValues }: LinkFormProps) => {
 				) {
 					const processedValue = {
 						data: {
-							user_id: user?.id,
+							id: defaultValues[idx].platform?.id,
 							origin: val.platform?.name,
 							link: val.link,
 						},
@@ -67,7 +66,10 @@ const LinksForm = ({ defaultValues }: LinkFormProps) => {
 		console.log(payload);
 		if (payload.length > 0) {
 			await updateLink(payload);
+		} else {
+			return;
 		}
+		console.log("update finished");
 	};
 
 	const { fields, append, remove } = useFieldArray({ control, name: "fields" });
