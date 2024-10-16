@@ -23,7 +23,7 @@ const HomeLayout = () => {
 
 	return (
 		<section className="w-screen h-screen bg-milk md:p-6 ">
-			<header className="p-4 mb-6 flex items-center justify-between bg-white md:rounded-xl">
+			<header className="p-4 mb-6 flex items-center justify-between bg-white rounded-xl shadow-">
 				<h1 className="px-4 py-3">
 					<img
 						src={
@@ -102,7 +102,17 @@ const HomeLayout = () => {
 					</span>
 				</Link>
 			</header>
-			<Outlet />
+			<div className="flex">
+				<div className="hidden min-w-[560px]  items-center justify-center lg:flex bg-milk">
+					<img
+						src="assets/images/illustration-phone-mockup.svg"
+						alt=""
+						width={307}
+						height={630}
+					/>
+				</div>
+				<Outlet />
+			</div>
 		</section>
 	);
 };
