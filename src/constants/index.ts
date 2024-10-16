@@ -36,7 +36,7 @@ export const selectItems: SelectItem[] = [
 	{
 		name: "Fronend Mentor",
 		logo: frontEndMentor,
-		color: "#fff",
+		color: "#fafafa",
 		border: "#d9d9d9",
 	},
 	{

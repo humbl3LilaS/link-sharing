@@ -4,6 +4,7 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import HomeLayout from "./components/HomeLayout";
 import Links from "./pages/Links";
+import Preview from "./pages/Preview";
 import { authRouteGuard, routeGuard } from "./loader/routeGuard";
 
 const routers = createBrowserRouter([
@@ -13,9 +14,9 @@ const routers = createBrowserRouter([
 		children: [
 			{ index: true, element: <Links />, loader: routeGuard },
 			{ path: "profile", element: <div>profile</div>, loader: routeGuard },
-			{ path: "preview", element: <div>preview</div>, loader: routeGuard },
 		],
 	},
+	{ path: "/preview", element: <Preview />, loader: routeGuard },
 	{
 		path: "/auth",
 		loader: authRouteGuard,
