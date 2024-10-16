@@ -1,26 +1,86 @@
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import Selector from "../components/Selector";
 import { SelectItem } from "../constants";
+import { useUserQuery } from "../api/query";
+import { useEffect } from "react";
+import { LinkUpdateProps } from "../api/api.types";
+import { useDeleteLink, useUpdateLink } from "../api/mutation";
 
-interface LinkFormInput {
+export interface LinkFormInput {
 	fields: {
 		platform: SelectItem | null;
 		link: string;
 	}[];
 }
 
-const LinksForm = () => {
-	const { register, control, handleSubmit } = useForm<LinkFormInput>({
+type LinkFormProps = {
+	defaultValues: LinkFormInput["fields"];
+};
+
+const LinksForm = ({ defaultValues }: LinkFormProps) => {
+	const { data: user } = useUserQuery();
+	const { mutateAsync: updateLink } = useUpdateLink();
+	const { mutateAsync: deleteLink } = useDeleteLink();
+	console.log(user?.id);
+
+	const { register, control, handleSubmit, reset } = useForm<LinkFormInput>({
 		defaultValues: {
-			fields: [],
+			fields: defaultValues,
 		},
 	});
 
+	useEffect(() => {
+		reset({ fields: defaultValues });
+	}, [defaultValues]);
+
 	const onSubmit: SubmitHandler<LinkFormInput> = async (value) => {
-		console.log(value.fields[0].platform?.logo);
+		const payload = value.fields.reduce((arr, val, idx) => {
+			if (idx < defaultValues.length) {
+				if (
+					val.platform?.name !== defaultValues[idx].platform?.name ||
+					val.link !== defaultValues[idx].link
+				) {
+					const processedValue = {
+						data: {
+							user_id: user?.id,
+							origin: val.platform?.name,
+							link: val.link,
+						},
+						isInsert: false,
+					};
+					return [...arr, processedValue];
+				} else {
+					return [...arr];
+				}
+			} else {
+				const processedValue = {
+					data: {
+						user_id: user?.id,
+						origin: val.platform?.name,
+						link: val.link,
+					},
+					isInsert: true,
+				};
+				return [...arr, processedValue];
+			}
+		}, [] as LinkUpdateProps[]);
+		console.log(payload);
+		if (payload.length > 0) {
+			await updateLink(payload);
+		}
 	};
 
 	const { fields, append, remove } = useFieldArray({ control, name: "fields" });
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const removeHandler = async (idx: number, field: any) => {
+		remove(idx);
+		const deletedLink = await deleteLink(field?.platform?.id);
+		if (deletedLink) {
+			console.log("error");
+		}
+		console.log(deletedLink);
+	};
 
 	return (
 		<div>
@@ -40,7 +100,7 @@ const LinksForm = () => {
 							</p>
 							<button
 								className="text-danger"
-								onClick={() => remove(idx)}
+								onClick={() => removeHandler(idx, field)}
 								type="button">
 								Remove
 							</button>

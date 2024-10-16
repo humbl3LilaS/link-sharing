@@ -1,6 +1,12 @@
+import { useGetSavedLink, useUserQuery } from "../api/query";
 import LinksForm from "../form/LinksForm";
+import { useGenerateLinkFormValue } from "../hook/useGenerateLinkFormValue";
 
 const Links = () => {
+	const { data: user } = useUserQuery();
+	const { data: links } = useGetSavedLink(user?.id);
+	const defaultValues = useGenerateLinkFormValue(links ?? []);
+
 	return (
 		<div className="w-full  p-4 md:p-0 lg:flex">
 			<div className="hidden min-w-[560px]  items-center justify-center lg:flex bg-milk">
@@ -21,7 +27,7 @@ const Links = () => {
 						the world!
 					</p>
 				</div>
-				<LinksForm />
+				<LinksForm defaultValues={defaultValues} />
 			</div>
 		</div>
 	);

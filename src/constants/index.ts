@@ -19,6 +19,7 @@ export interface SelectItem {
 	logo: string;
 	color: string;
 	border?: string;
+	id?: number;
 }
 
 export const selectItems: SelectItem[] = [
