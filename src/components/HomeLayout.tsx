@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { cn } from "../util";
+import ImagePreview from "./ImagePreview";
 
 const HomeLayout = () => {
 	const [isLargeDevice, setIsLargeDevice] = useState(window.innerWidth >= 768);
@@ -103,14 +104,7 @@ const HomeLayout = () => {
 				</Link>
 			</header>
 			<div className="flex">
-				<div className="hidden min-w-[560px]  items-center justify-center lg:flex bg-milk">
-					<img
-						src="assets/images/illustration-phone-mockup.svg"
-						alt=""
-						width={307}
-						height={630}
-					/>
-				</div>
+				<ImagePreview />
 				<Outlet />
 			</div>
 		</section>
