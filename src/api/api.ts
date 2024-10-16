@@ -1,4 +1,4 @@
-import { LinkUpdateProps, TSignupUser } from "./api.types";
+import { LinkUpdateProps, TSignupUser, TUserData } from "./api.types";
 import { TLink } from "./query.types";
 import { supabase } from "./supabaseClient";
 
@@ -7,7 +7,7 @@ export const singUpNewUser = async ({
 	password,
 	username,
 }: TSignupUser) => {
-	const { data: signInData, error } = await supabase.auth.signUp({
+	const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
 		email,
 		password,
 		options: {
@@ -16,11 +16,24 @@ export const singUpNewUser = async ({
 			},
 		},
 	});
-	if (error) {
-		console.log(error);
-		throw new Error(error.message);
+
+	if (signUpError) {
+		console.log("Sign up error ", signUpError);
+		throw new Error(signUpError.message);
 	}
-	return signInData;
+
+	const { error: tableInsertError } = await supabase.from("_user").insert({
+		auth_id: signUpData?.user?.id,
+		email,
+		username,
+	});
+
+	if (tableInsertError) {
+		console.log("user info insert error", tableInsertError);
+		throw new Error(tableInsertError.message);
+	}
+
+	return signUpData;
 };
 export const signIn = async ({
 	email,
@@ -95,4 +108,29 @@ export const deleteLink = async (id: number) => {
 		console.log("error");
 	}
 	return data;
+};
+
+export const getUserById = async (id: string): Promise<TUserData> => {
+	if (id === "") {
+		throw new Error("empty");
+	}
+
+	const { data, error } = await supabase
+		.from("_user")
+		.select("*")
+		.eq("auth_id", id)
+		.single();
+
+	if (error) {
+		console.log(error);
+	}
+	return data;
+};
+
+export const logout = async () => {
+	const { error } = await supabase.auth.signOut();
+	if (error) {
+		console.log("signout error", error);
+	}
+	return true;
 };

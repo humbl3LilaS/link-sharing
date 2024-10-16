@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteLink, updateLink } from "./api";
+import { deleteLink, logout, updateLink } from "./api";
 import { LinkUpdateProps } from "./api.types";
 
 export const useUpdateLink = () => {
@@ -21,6 +21,24 @@ export const useDeleteLink = () => {
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
 				queryKey: ["links"],
+			});
+		},
+	});
+};
+
+export const useLogout = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: logout,
+		onSuccess: () => {
+			queryClient.removeQueries({
+				queryKey: ["user"],
+			});
+			queryClient.removeQueries({
+				queryKey: ["links"],
+			});
+			queryClient.removeQueries({
+				queryKey: ["user-details"],
 			});
 		},
 	});

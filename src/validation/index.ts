@@ -56,3 +56,32 @@ export const SignupSchema = z
 	});
 
 export type SingupSchemaType = Zod.infer<typeof SignupSchema>;
+
+export const ProfileFormSchema = z.object({
+	profile: z.any().optional(),
+	username: z
+		.string({ message: "required" })
+		.max(20, { message: "Too long" })
+		.regex(/^[a-zA-Z]+$/, {
+			message: "Invalid username",
+		}),
+	firstName: z
+		.string()
+		.max(20, { message: "Too long" })
+		.regex(/^[a-zA-Z]+$/, {
+			message: "Invalid username",
+		})
+		.optional(),
+	lastName: z
+		.string()
+		.max(20, { message: "Too long" })
+		.regex(/^[a-zA-Z]+$/, {
+			message: "Invalid username",
+		})
+		.optional(),
+	email: z
+		.string({ message: "Can't be empty" })
+		.email({ message: "Invallid emaill" }),
+});
+
+export type ProfileSchemaType = Zod.infer<typeof ProfileFormSchema>;

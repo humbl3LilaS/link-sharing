@@ -6,6 +6,7 @@ import HomeLayout from "./components/HomeLayout";
 import Links from "./pages/Links";
 import Preview from "./pages/Preview";
 import { authRouteGuard, routeGuard } from "./loader/routeGuard";
+import Profile from "./pages/Profile";
 
 const routers = createBrowserRouter([
 	{
@@ -13,7 +14,7 @@ const routers = createBrowserRouter([
 		element: <HomeLayout />,
 		children: [
 			{ index: true, element: <Links />, loader: routeGuard },
-			{ path: "profile", element: <div>profile</div>, loader: routeGuard },
+			{ path: "profile", element: <Profile />, loader: routeGuard },
 		],
 	},
 	{ path: "/preview", element: <Preview />, loader: routeGuard },
