@@ -18,8 +18,8 @@ const Login = () => {
 						Add your details below to get back into the app
 					</p>
 				</div>
+				<LoginForm />
 			</div>
-			<LoginForm />
 		</section>
 	);
 };
