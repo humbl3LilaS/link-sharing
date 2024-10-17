@@ -62,7 +62,16 @@ export const getUser = async () => {
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
-	return user;
+	const { data: userData, error } = await supabase
+		.from("_user")
+		.select()
+		.eq("auth_id", user?.id)
+		.single();
+	if (error) {
+		console.log("Fetching failed");
+		throw new Error(error.message);
+	}
+	return userData;
 };
 
 export const getAllLink = async (
