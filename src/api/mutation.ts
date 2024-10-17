@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteLink, logout, updateLink } from "./api";
-import { LinkUpdateProps } from "./api.types";
+import { deleteLink, logout, updateLink, uploadPhoto } from "./api";
+import { LinkUpdateProps, TUploadPhoto } from "./api.types";
 
 export const useUpdateLink = () => {
 	const queryClient = useQueryClient();
@@ -42,6 +42,21 @@ export const useLogout = () => {
 				queryKey: ["links"],
 			});
 			queryClient.removeQueries({
+				queryKey: ["user-details"],
+			});
+		},
+	});
+};
+
+export const useUploadPhoto = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (payload: TUploadPhoto) => uploadPhoto(payload),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: ["user"],
+			});
+			await queryClient.invalidateQueries({
 				queryKey: ["user-details"],
 			});
 		},

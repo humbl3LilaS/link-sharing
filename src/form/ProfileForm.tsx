@@ -4,14 +4,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ProfileFormSchema } from "../validation/index";
 import { TUserData } from "../api/api.types";
 import { useEffect } from "react";
-import { useLogout } from "../api/mutation";
+import { useLogout, useUploadPhoto } from "../api/mutation";
 import { useNavigate } from "react-router-dom";
+import ImageUploader from "../components/ImageUploader";
+import { useUserQuery } from "../api/query";
 
 const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {
 	const {
 		register,
 		control,
-		formState: { errors, isSubmitting, isValid },
+		formState: { errors, isSubmitting, isValid, dirtyFields },
 		handleSubmit,
 		reset,
 	} = useForm<ProfileSchemaType>({
@@ -20,11 +22,20 @@ const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {
 		defaultValues: defaultValues,
 	});
 
+	const { data: user } = useUserQuery();
 	const { mutateAsync: logout } = useLogout();
+	const { mutateAsync: uploadPhoto } = useUploadPhoto();
 	const navigate = useNavigate();
-
-	const onSubmit: SubmitHandler<ProfileSchemaType> = (value) => {
-		console.log(value);
+	const onSubmit: SubmitHandler<ProfileSchemaType> = async (value) => {
+		if (dirtyFields?.profile && value.profile && user) {
+			console.log("photo upload invoke");
+			const type = value.profile.type.split("/")[1];
+			await uploadPhoto({
+				path: `${user?.id}/assets/profile.${type}`,
+				file: value.profile,
+				userId: user?.id,
+			});
+		}
 	};
 
 	const logoutHandler = async () => {
@@ -44,17 +55,13 @@ const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className="p-5 mb-6 bg-milk rounded-lg md:flex md:justify-between	 md:items-center md:gap-x-6">
 					<p className="mb-4 text-paleGray md:mr-auto">Profile picture</p>
-					<label
-						htmlFor="profile"
-						className="aspect-square w-48 mb-6 flex flex-col items-center justify-center gap-y-2 rounded-lg bg-tertiary">
-						<img src="/assets/images/icon-upload-image.svg" />
-						<span className="font-semibold text-primary">+ Upload Image</span>
-					</label>
-					<input
-						type="file"
-						id="profile"
-						className="hidden"
-					/>
+					{defaultValues && (
+						<ImageUploader
+							mediaUrl={defaultValues?.image_url}
+							control={control}
+							name={"profile"}
+						/>
+					)}
 					<p className="text-sm text-paleGray">
 						Image must be below 1024x1025px.
 						<br className="hidden md:block" /> Use PNG or JGP format.
@@ -73,6 +80,7 @@ const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {
 							id="firstName"
 							{...register("firstName")}
 						/>
+						{errors.firstName && <div>{errors.firstName.message}</div>}
 					</div>
 					<div className="mb-3">
 						<label
@@ -86,6 +94,7 @@ const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {
 							id="lastName"
 							{...register("lastName")}
 						/>
+						{errors.lastName && <div>{errors.lastName.message}</div>}
 					</div>
 					<div className="mb-3">
 						<label
@@ -99,6 +108,7 @@ const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {
 							id="username"
 							{...register("username")}
 						/>
+						{errors.username && <div>{errors.username.message}</div>}
 					</div>
 
 					<div>
@@ -113,6 +123,7 @@ const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {
 							id="email"
 							{...register("email")}
 						/>
+						{errors.email && <div>{errors.email.message}</div>}
 					</div>
 				</div>
 				<hr className="my-6" />

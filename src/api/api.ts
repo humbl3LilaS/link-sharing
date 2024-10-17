@@ -1,4 +1,9 @@
-import { LinkUpdateProps, TSignupUser, TUserData } from "./api.types";
+import {
+	LinkUpdateProps,
+	TSignupUser,
+	TUploadPhoto,
+	TUserData,
+} from "./api.types";
 import { TLink } from "./query.types";
 import { supabase } from "./supabaseClient";
 
@@ -150,4 +155,54 @@ export const logout = async () => {
 		console.log("signout error", error);
 	}
 	return true;
+};
+
+export const uploadPhoto = async ({ path, file, userId }: TUploadPhoto) => {
+	const { data: isExist } = await supabase.storage.from("avatars").exists(path);
+	let imageData: { id?: string; url?: string } = {
+		id: "",
+		url: "",
+	};
+
+	if (isExist) {
+		const { data, error: updateError } = await supabase.storage
+			.from("avatars")
+			.update(path, file);
+		if (updateError) {
+			console.log("update failed");
+			throw new Error(updateError.message);
+		}
+		imageData = {
+			id: data.id,
+			url: data.fullPath,
+		};
+	} else {
+		const { data, error: uploadError } = await supabase.storage
+			.from("avatars")
+			.upload(path, file);
+		if (uploadError) {
+			console.log("photo upload failed");
+			throw new Error(uploadError?.message);
+		}
+		imageData = {
+			id: data.id,
+			url: data.fullPath,
+		};
+	}
+
+	const { data, error: infoUpdateError } = await supabase
+		.from("_user")
+		.update({
+			image_id: imageData.id,
+			image_url: imageData.url,
+		})
+		.eq("auth_id", userId)
+		.select()
+		.single();
+
+	if (infoUpdateError) {
+		console.log(infoUpdateError);
+	}
+
+	return data;
 };
