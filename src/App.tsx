@@ -7,6 +7,7 @@ import Links from "./pages/Links";
 import Preview from "./pages/Preview";
 import { authRouteGuard, routeGuard } from "./loader/routeGuard";
 import Profile from "./pages/Profile";
+import SharedPreview from "./components/SharedPreview";
 
 const routers = createBrowserRouter([
 	{
@@ -18,6 +19,7 @@ const routers = createBrowserRouter([
 		],
 	},
 	{ path: "/preview", element: <Preview />, loader: routeGuard },
+	{ path: "/account/preview/:userId", element: <SharedPreview /> },
 	{
 		path: "/auth",
 		loader: authRouteGuard,
