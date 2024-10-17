@@ -4,7 +4,7 @@ import { useGenerateLinkFormValue } from "../hook/useGenerateLinkFormValue";
 
 const Links = () => {
 	const { data: user } = useUserQuery();
-	const { data: links } = useGetSavedLink(user?.id);
+	const { data: links } = useGetSavedLink(user?.auth_id);
 	const defaultValues = useGenerateLinkFormValue(links ?? []);
 
 	return (

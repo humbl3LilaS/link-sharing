@@ -6,10 +6,10 @@ import toast, { Toaster } from "react-hot-toast";
 
 const Preview = () => {
 	const { data: user } = useUserQuery();
-	const { data: links } = useGetSavedLink(user?.id ?? "");
+	const { data: links } = useGetSavedLink(user?.auth_id ?? "");
 	const styleLinks = useGenerateLinkFormValue(links ?? []);
-	const sharedLink = user && `/account/preview/${user.id}`;
-	console.log(sharedLink);
+	const sharedLink =
+		user && `${import.meta.env.VITE_HOST}account/preview/${user.auth_id}`;
 	const clipBtnHandler = async () => {
 		try {
 			if (sharedLink) {
@@ -40,16 +40,23 @@ const Preview = () => {
 				{user && (
 					<div className="mb-14">
 						<img
-							src="/assets/images/icon-profile-details-header.svg"
+							src={
+								user?.image_url
+									? `${
+											import.meta.env.VITE_SUPABASE_URL
+									  }/storage/v1/object/public/${user?.image_url}`
+									: "/assets/images/icon-profile-details-header.svg"
+							}
 							alt="profile"
-							className="aspect-square w-24  mb-6 mx-auto outline-primary outline-2"
+							className={cn(
+								"aspect-square w-24  mb-6 mx-auto outline-primary outline-2",
+								user?.image_url && "rounded-full",
+							)}
 						/>
 						<h2 className="mb-2 text-center text-3xl text-black font-bold ">
-							{user.user_metadata.username}
+							{user?.username}
 						</h2>
-						<p className="text-center text-paleGray">
-							{user.user_metadata.email}
-						</p>
+						<p className="text-center text-paleGray">{user?.email}</p>
 					</div>
 				)}
 

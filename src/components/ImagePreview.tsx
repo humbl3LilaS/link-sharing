@@ -5,7 +5,6 @@ import { cn } from "../util";
 const ImagePreview = () => {
 	const { data: user } = useUserQuery();
 	const { data: links } = useGetSavedLink(user?.id);
-	// console.log("links in image preview ", links);
 
 	const styledLinks = useGenerateLinkFormValue(links ?? []).map(
 		(item) => item.platform,
@@ -23,7 +22,24 @@ const ImagePreview = () => {
 			</div>
 			<div className="relative h-[611px] w-[258px] flex flex-col items-center z-20">
 				{/* profile rect */}
-				<div className="w-[237px] h-[158px] mt-14 my-12"></div>
+				<div className="w-[237px] h-[158px] mt-14 my-12 flex flex-col items-center">
+					{user?.image_url ? (
+						<img
+							src={`${
+								import.meta.env.VITE_SUPABASE_URL
+							}/storage/v1/object/public/${user?.image_url}`}
+							className="aspect-square w-24 rounded-full mb-5"
+						/>
+					) : (
+						<span className="aspect-square w-24 rounded-full mb-5" />
+					)}
+					<div className="bg-white">
+						<h2 className="mb-2 text-center text-xl text-black font-bold ">
+							{user?.username}
+						</h2>
+						<p className="text-center text-paleGray">{user?.email}</p>
+					</div>
+				</div>
 				<ul className="relative flex flex-col z-20 gap-y-4">
 					{styledLinks &&
 						styledLinks.length < 6 &&
