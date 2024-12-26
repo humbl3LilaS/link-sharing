@@ -28,7 +28,6 @@ const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {
 	const navigate = useNavigate();
 	const onSubmit: SubmitHandler<ProfileSchemaType> = async (value) => {
 		if (dirtyFields?.profile && value.profile && user) {
-			console.log("photo upload invoke");
 			const type = value.profile.type.split("/")[1];
 			await uploadPhoto({
 				path: `${user?.id}/assets/profile.${type}`,
@@ -41,7 +40,6 @@ const ProfileForm = ({ defaultValues }: { defaultValues?: TUserData }) => {
 	const logoutHandler = async () => {
 		const data = await logout();
 		if (data) {
-			console.log("log outted");
 			navigate("/auth/login");
 		}
 	};

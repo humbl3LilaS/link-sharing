@@ -6,11 +6,7 @@ export const useUpdateLink = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (payload: LinkUpdateProps[]) => updateLink(payload),
-		onMutate: async (data) => {
-			console.log("onMutation of updateLinks", data);
-		},
-		onSuccess: async (data) => {
-			console.log("onsuccess", data);
+		onSuccess: async () => {
 			await queryClient.invalidateQueries({
 				queryKey: ["links"],
 			});

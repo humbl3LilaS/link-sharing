@@ -3,7 +3,6 @@ import { selectItems } from "../constants";
 import { LinkFormInput } from "../form/LinksForm";
 
 export const useGenerateLinkFormValue = (payload: TLink[]) => {
-	// console.log("useGeneratedLinkForm updated");
 	const links = payload.map((item) => item.link);
 	const origin = payload.map((item) => item.origin);
 	const ids = payload.map((item) => item.id);

@@ -17,7 +17,6 @@ const Preview = () => {
 			}
 			toast("Link Copied", { duration: 750 });
 		} catch (error) {
-			console.log(error);
 		}
 	};
 
